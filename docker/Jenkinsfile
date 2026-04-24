@@ -8,8 +8,13 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                // Windows の Jenkins であれば 'bat', Linux なら 'sh'
-                bat 'docker build -t hello:latest .'
+                // Dockerfile と hello.c が `docker/` ディレクトリにある場合
+                // カレントディレクトリを `docker` ディレクトリに変更してからビルド
+                dir('docker') {
+                    bat 'docker build -t hello:latest .'
+                }
+                // もしくは、ビルドコンテキストのパスを明示的に指定する
+                // bat 'docker build -t hello:latest docker' // リポジトリのルートから docker/ を指定
             }
         }
         stage('Run tests') {
