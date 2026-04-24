@@ -8,7 +8,7 @@ RUN gcc -O2 -o hello hello.c
 
 # final stage
 # alpine の代わりに、debian系の軽量イメージである debian:slim を使用
-FROM debian:slim
+FROM debian:latest
 WORKDIR /app
 COPY --from=build /src/hello .
 CMD ["./hello"]
