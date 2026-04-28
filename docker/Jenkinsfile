@@ -38,7 +38,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'webhook_URL', variable: 'WEBHOOK_URL_SECRET')]) {
                     // Windows エージェントを想定し、batステップを使用
                     bat """
-                        python send_masseage_buold.py "${WEBHOOK_URL_SECRET}" "${message}"
+                        python send_masseage_build.py "${WEBHOOK_URL_SECRET}" "${message}"
                     """
                 }
             }
@@ -49,7 +49,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'webhook_URL', variable: 'WEBHOOK_URL_SECRET')]) {
                     // Windows エージェントを想定し、batステップを使用
                     bat """
-                        python send_masseage_buold.py "${WEBHOOK_URL_SECRET}" "${message}"
+                        python send_masseage_build.py "${WEBHOOK_URL_SECRET}" "${message}"
                     """
                 }
             }
