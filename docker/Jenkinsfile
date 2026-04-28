@@ -35,7 +35,7 @@ pipeline {
         success {
             script {
                 def message = "ビルド成功：[ビルドURL](${env.BUILD_URL})"
-                withCredentials([string(credentialsId: 'twebhook_URL', variable: 'WEBHOOK_URL_SECRET')]) {
+                withCredentials([string(credentialsId: 'webhook_URL', variable: 'WEBHOOK_URL_SECRET')]) {
                     // chcp 65001 でコマンドプロンプトのエンコーディングを UTF-8 に変更
                     bat """
                         chcp 65001
