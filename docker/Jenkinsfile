@@ -35,10 +35,11 @@ pipeline {
         success {
             script {
                 def message = "ビルド成功：[ビルドURL](${env.BUILD_URL})"
-                withCredentials([string(credentialsId: 'webhook_URL', variable: 'WEBHOOK_URL_SECRET')]) {
-                    // Windows エージェントを想定し、batステップを使用
+                withCredentials([string(credentialsId: 'twebhook_URL', variable: 'WEBHOOK_URL_SECRET')]) {
+                    // chcp 65001 でコマンドプロンプトのエンコーディングを UTF-8 に変更
                     bat """
-                        python send_masseage_build.py "${WEBHOOK_URL_SECRET}" "${message}"
+                        chcp 65001
+                        python send_message_build.py "${WEBHOOK_URL_SECRET}" "${message}"
                     """
                 }
             }
@@ -47,15 +48,15 @@ pipeline {
             script {
                 def message = "ビルド失敗：[ビルドURL](${env.BUILD_URL})"
                 withCredentials([string(credentialsId: 'webhook_URL', variable: 'WEBHOOK_URL_SECRET')]) {
-                    // Windows エージェントを想定し、batステップを使用
+                    // chcp 65001 でコマンドプロンプトのエンコーディングを UTF-8 に変更
                     bat """
-                        python send_masseage_build.py "${WEBHOOK_URL_SECRET}" "${message}"
+                        chcp 65001
+                        python send_message_build.py "${WEBHOOK_URL_SECRET}" "${message}"
                     """
                 }
             }
         }
         always {
-            // ビルド後にローカルイメージをクリーンアップするなど
             bat 'docker image prune -f'
         }
     }
