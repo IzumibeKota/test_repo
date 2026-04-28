@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     stages {
         stage('Checkout') {
             steps {
@@ -8,24 +9,21 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                // Dockerfile と hello.c が `docker/` ディレクトリにある場合
-                // カレントディレクトリを `docker` ディレクトリに変更してからビルド
                 dir('docker') {
+                    // Windows エージェントを想定
                     bat 'docker build -t hello:latest .'
                 }
-                // もしくは、ビルドコンテキストのパスを明示的に指定する
-                // bat 'docker build -t hello:latest docker' // リポジトリのルートから docker/ を指定
             }
         }
         stage('Run tests') {
             steps {
-                // コンテナを実行して出力を確認
+                // Windows エージェントを想定
                 bat 'docker run --rm hello:latest'
             }
         }
         stage('Push (optional)') {
             when {
-                expression { return false } // 必要なら true にして registry へ push
+                expression { return false } // 必要ならtrueにしてregistryへpush
             }
             steps {
                 // 例: docker login と docker push の処理を入れる
@@ -34,6 +32,28 @@ pipeline {
         }
     }
     post {
+        success {
+            script {
+                def message = "ビルド成功：[ビルドURL](${env.BUILD_URL})"
+                withCredentials([string(credentialsId: 'webhook_URL', variable: 'WEBHOOK_URL_SECRET')]) {
+                    // Windows エージェントを想定し、batステップを使用
+                    bat """
+                        python send_teams_notification.py "${WEBHOOK_URL_SECRET}" "${message}"
+                    """
+                }
+            }
+        }
+        failure {
+            script {
+                def message = "ビルド失敗：[ビルドURL](${env.BUILD_URL})"
+                withCredentials([string(credentialsId: 'webhook_URL', variable: 'WEBHOOK_URL_SECRET')]) {
+                    // Windows エージェントを想定し、batステップを使用
+                    bat """
+                        python send_teams_notification.py "${WEBHOOK_URL_SECRET}" "${message}"
+                    """
+                }
+            }
+        }
         always {
             // ビルド後にローカルイメージをクリーンアップするなど
             bat 'docker image prune -f'
